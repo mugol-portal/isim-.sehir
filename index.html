@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İsim-Şehir</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --paper: #FBF3E3;
+            --paper-card: #FFFDF8;
+            --ink: #2B2E4A;
+            --ink-soft: #6B6F8F;
+            --line: #E4D9C0;
+
+            --isim: #E85D75;
+            --isim-soft: #FCE4E8;
+            --sehir: #4C9F70;
+            --sehir-soft: #E1F0E4;
+            --hayvan: #F2A93B;
+            --hayvan-soft: #FDEFD9;
+            --bitki: #3AAFA9;
+            --bitki-soft: #DFF3F2;
+            --esya: #9B72CF;
+            --esya-soft: #EEE4F9;
+            --ulke: #3E7CB1;
+            --ulke-soft: #E1EBF3;
+
+            --gold: #F5B70A;
+            --gold-deep: #C98F00;
+            --danger: #E1483F;
+            --win: #4C9F70;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background:
+                radial-gradient(circle at 15% 10%, rgba(232,93,117,0.06), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(62,124,177,0.07), transparent 45%),
+                var(--paper);
+            color: var(--ink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+            background: var(--paper-card);
+            border-radius: 22px;
+            box-shadow: 0 20px 50px rgba(43, 46, 74, 0.14);
+            border: 2px solid var(--ink);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Kağıt köşe kıvrımı hissi */
+        .wrapper::after {
+            content: "";
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 90px; height: 90px;
+            background: var(--gold);
+            opacity: 0.15;
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-family: 'Baloo 2', sans-serif;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: -0.3px;
+        }
+
+        h1 .letter-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--ink);
+            color: var(--gold);
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            transform: rotate(-4deg);
+            margin-left: 4px;
+        }
+
+        .screen { display: none; }
+        .active { display: block; animation: fadeIn 0.35s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ KURULUM ============ */
+        .setup-screen { display: flex; flex-direction: column; gap: 16px; padding: 8px 4px 4px; }
+
+        .setup-intro {
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            padding: 0 6px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+
+        .lifetime-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .lifetime-stats .ls-card {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            text-align: center;
+        }
+        .lifetime-stats .ls-val {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--ink);
+        }
+        .lifetime-stats .ls-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .form-group input, .form-group select {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            color: var(--ink);
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus, .form-group select:focus { border-color: var(--ink); }
+
+        .segmented {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .segmented button {
+            flex: 1;
+            min-width: 90px;
+            padding: 11px 8px;
+            border-radius: 12px;
+            border: 2px solid var(--line);
+            background: var(--paper);
+            color: var(--ink-soft);
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .segmented button.selected {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: var(--gold);
+        }
+
+        .cta-btn {
+            justify-content: center;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: var(--ink);
+            color: var(--gold);
+            border: none;
+            cursor: pointer;
+            padding: 16px;
+            border-radius: 14px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 0 rgba(43,46,74,0.35);
+        }
+        .cta-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(43,46,74,0.35); }
+        .cta-btn:hover { filter: brightness(1.1); }
+
+        .exit-btn {
+            justify-content: center;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            background: var(--paper);
+            color: var(--ink-soft);
+            border: 2px solid var(--line);
+            cursor: pointer;
+            padding: 13px;
+            border-radius: 14px;
+            transition: all 0.15s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        .exit-btn:hover { border-color: var(--ink); color: var(--ink); }
+        .exit-btn:active { transform: translateY(2px); }
+
+        /* ============ ÜST BAR: Round + Streak ============ */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 4px;
+        }
+
+        .round-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .round-dots .dot {
+            width: 20px; height: 20px;
+            border-radius: 7px;
+            background: var(--paper-card);
+            border: 2px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            transform: rotate(-4deg);
+            transition: all 0.2s;
+        }
+        .round-dots .dot.won-player {
+            background: var(--win);
+            border-color: var(--ink);
+        }
+        .round-dots .dot.won-player::after { content: "✓"; color: #fff; font-weight: 800; }
+        .round-dots .dot.won-bot {
+            background: var(--danger);
+            border-color: var(--ink);
+        }
+        .round-dots .dot.won-bot::after { content: "✕"; color: #fff; font-weight: 800; }
+        .round-dots .dot.current {
+            border-color: var(--ink);
+            background: var(--gold);
+            animation: pulse-dot 1s infinite ease-in-out;
+        }
+
+        @keyframes pulse-dot { 0%,100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+
+        .round-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .streak-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+            color: var(--ink);
+            font-weight: 800;
+            font-size: 0.78rem;
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 2px solid var(--ink);
+            opacity: 0;
+            transform: scale(0.7);
+            transition: all 0.25s ease;
+        }
+        .streak-chip.show { opacity: 1; transform: scale(1); }
+
+        .sound-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            border: 2px solid var(--line);
+            background: var(--paper-card);
+            color: var(--ink-soft);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: none;
+        }
+        .sound-toggle-btn:hover { border-color: var(--ink); color: var(--ink); }
+        .sound-toggle-btn.muted { opacity: 0.55; }
+
+        /* ============ OYUNCU KARTLARI ============ */
+        .players-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .player-chip {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 10px;
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 16px;
+            padding: 10px 12px;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .chip-main {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .player-chip.active-turn {
+            border-color: var(--ink);
+            background: var(--isim-soft);
+        }
+        .player-chip.active-turn.bot-active { background: var(--ulke-soft); }
+
+        .chip-avatar {
+            width: 40px; height: 40px;
+            flex: none;
+            border-radius: 11px;
+            background: var(--paper-card);
+            border: 2px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .chip-info {
+            min-width: 0;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .chip-info h3 {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .chip-info .chip-score {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--ink-soft);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .chip-clock {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.15rem;
+            background: var(--ink);
+            color: var(--gold);
+            padding: 5px 9px;
+            border-radius: 8px;
+            width: 68px;
+            flex: 0 0 68px;
+            text-align: center;
+            margin-left: auto;
+        }
+
+        .chip-clock.low-time {
+            background: var(--danger);
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-1.5px); }
+            75% { transform: translateX(1.5px); }
+        }
+
+        .thinking-dots {
+            display: none;
+            gap: 3px;
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+        }
+        .player-chip.is-thinking .thinking-dots { display: flex; }
+        .thinking-dots span {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--ulke);
+            animation: dot-pulse 1s infinite ease-in-out;
+        }
+        .thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes dot-pulse {
+            0%, 60%, 100% { opacity: 0.25; transform: scale(0.8); }
+            30% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ============ KELİME KARTLARI (KATEGORİLER) ============ */
+        .answers-panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .answers-panel {
+            border: 2px solid var(--line);
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--paper);
+            min-width: 0;
+        }
+
+        .answers-panel.you-panel { background: var(--isim-soft); border-color: var(--isim); }
+        .answers-panel.bot-panel { background: var(--ulke-soft); border-color: var(--ulke); }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 0 2px 2px;
+        }
+
+        .answers-panel.you-panel .panel-title { color: var(--isim); }
+        .answers-panel.bot-panel .panel-title { color: var(--ulke); }
+
+        .panel-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .panel-row {
+            background: var(--paper-card);
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: all 0.2s;
+            min-width: 0;
+        }
+
+        .panel-row.current-move {
+            border-color: var(--ink);
+            box-shadow: 0 3px 0 rgba(43,46,74,0.15);
+        }
+
+        .panel-row .cat-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .panel-row .cat-icon {
+            width: 18px; height: 18px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            flex: none;
+        }
+
+        .panel-row[data-cat="isim"] .cat-header { color: var(--isim); }
+        .panel-row[data-cat="isim"] .cat-icon { background: var(--isim-soft); }
+        .panel-row[data-cat="sehir"] .cat-header { color: var(--sehir); }
+        .panel-row[data-cat="sehir"] .cat-icon { background: var(--sehir-soft); }
+        .panel-row[data-cat="hayvan"] .cat-header { color: var(--hayvan); }
+        .panel-row[data-cat="hayvan"] .cat-icon { background: var(--hayvan-soft); }
+        .panel-row[data-cat="bitki"] .cat-header { color: var(--bitki); }
+        .panel-row[data-cat="bitki"] .cat-icon { background: var(--bitki-soft); }
+        .panel-row[data-cat="esya"] .cat-header { color: var(--esya); }
+        .panel-row[data-cat="esya"] .cat-icon { background: var(--esya-soft); }
+        .panel-row[data-cat="ulke"] .cat-header { color: var(--ulke); }
+        .panel-row[data-cat="ulke"] .cat-icon { background: var(--ulke-soft); }
+
+        .panel-row-answer {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .answer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: var(--paper-card);
+        }
+
+        .answer-row .who { font-size: 0.68rem; color: var(--ink-soft); font-weight: 700; }
+        .answer-row .val { font-weight: 700; color: var(--ink); }
+        .answer-row .val.empty { color: #b8b0a0; font-style: italic; font-weight: 500; }
+
+        /* Rakip cevap gösterimi (panel-row-answer içinde) */
+        .bot-val {
+            flex: 1;
+            font-weight: 700;
+            color: var(--ink);
+            font-size: 0.8rem;
+        }
+        .bot-val.empty { color: #b8b0a0; font-style: italic; font-weight: 500; }
+
+        .row-meta {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex: none;
+        }
+
+        /* ============ DOĞRUDAN GİRİŞ (kart içi input) ============ */
+        .val-input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            background: var(--paper-card);
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 4px 6px;
+            border-radius: 8px;
+            outline: none;
+            text-align: left;
+            transition: all 0.15s;
+        }
+
+        .val-input::placeholder { color: #b8b0a0; font-style: italic; font-weight: 500; }
+
+        .val-input:disabled {
+            background: var(--paper-card);
+            opacity: 0.65;
+            cursor: default;
+        }
+
+        .panel-row.current-move .val-input:not(:disabled) {
+            background: #fff;
+            box-shadow: inset 0 0 0 2px var(--ink);
+        }
+
+        .panel-row.current-move .val-input:not(:disabled):focus {
+            box-shadow: inset 0 0 0 2px var(--gold-deep);
+        }
+
+        .turn-hint {
+            text-align: center;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            padding: 2px 4px;
+            transition: opacity 0.2s;
+        }
+        .turn-hint.bot-turn { color: var(--ulke); }
+
+        .move-pts {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            background: var(--gold);
+            color: var(--ink);
+            padding: 1px 6px;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+
+        .flip-in {
+            animation: flipIn 0.4s ease;
+        }
+        @keyframes flipIn {
+            from { transform: rotateX(90deg); opacity: 0; }
+            to { transform: rotateX(0deg); opacity: 1; }
+        }
+
+        /* ============ İPUCU / JOKER ============ */
+        .hint-row {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hint-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--paper-card);
+            border: 2px solid var(--gold-deep);
+            color: var(--gold-deep);
+            font-weight: 800;
+            font-size: 0.76rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .hint-btn:hover:not(:disabled) { background: var(--gold); color: var(--ink); }
+        .hint-btn:active:not(:disabled) { transform: scale(0.96); }
+        .hint-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            border-color: var(--line);
+            color: var(--ink-soft);
+        }
+
+        /* ============ HIZ ROZETİ ============ */
+        .speed-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: var(--gold);
+            color: var(--ink);
+            padding: 1px 6px;
+            border-radius: 5px;
+            margin-left: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* ============ GİRİŞ ALANI (eski, artık kullanılmıyor ama uyumluluk için tutuluyor) ============ */
+
+        /* ============ ROUND GEÇMİŞİ ============ */
+        .history-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 2px 2px;
+        }
+        .history-strip::-webkit-scrollbar { height: 5px; }
+        .history-strip::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+
+        .history-chip {
+            flex: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 12px;
+            min-width: 56px;
+        }
+
+        .history-chip .h-letter {
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--ink);
+        }
+
+        .history-chip .h-result {
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .history-chip.win-p { border-color: var(--win); }
+        .history-chip.win-p .h-result { color: var(--win); }
+        .history-chip.win-b { border-color: var(--danger); }
+        .history-chip.win-b .h-result { color: var(--danger); }
+        .history-chip.draw-h { border-color: var(--gold-deep); }
+        .history-chip.draw-h .h-result { color: var(--gold-deep); }
+
+        /* ============ MAÇ SONUCU / ANALİZ EKRANI ============ */
+        .result-screen-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .game-over-banner {
+            text-align: center;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            padding: 16px 14px 14px;
+            border-radius: 16px;
+            border: 2px solid var(--ink);
+        }
+
+        .game-over-banner .go-score {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 4px;
+            opacity: 0.85;
+        }
+
+        .game-over-banner.win { background: var(--sehir-soft); color: var(--win); }
+        .game-over-banner.lose { background: var(--isim-soft); color: var(--danger); }
+        .game-over-banner.draw { background: #FBF0D2; color: var(--gold-deep); }
+
+        .badges-earned {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 4px 0;
+        }
+
+        .badge-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .analysis-section-title {
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding-left: 2px;
+        }
+
+        /* Özet istatistik kartları */
+        .stat-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .stat-card .stat-icon { font-size: 1.15rem; }
+
+        .stat-card .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Doğru/Yanlış/Pas dağılım çubuğu */
+        .breakdown-card {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .breakdown-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .breakdown-track {
+            display: flex;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 2px solid var(--ink);
+        }
+
+        .breakdown-track .seg-correct { background: var(--win); }
+        .breakdown-track .seg-wrong { background: var(--danger); }
+        .breakdown-track .seg-pass { background: var(--line); }
+
+        .breakdown-legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+        }
+
+        .breakdown-legend span { display: flex; align-items: center; gap: 4px; }
+        .breakdown-legend .dot-legend {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .breakdown-legend .dot-legend.correct { background: var(--win); }
+        .breakdown-legend .dot-legend.wrong { background: var(--danger); }
+        .breakdown-legend .dot-legend.pass { background: var(--line); border: 1px solid var(--ink-soft); }
+
+        /* MVP / En zayıf kategori vurgu kartları */
+        .highlight-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .highlight-card {
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border: 2px solid var(--ink);
+        }
+
+        .highlight-card.best { background: var(--sehir-soft); }
+        .highlight-card.worst { background: var(--isim-soft); }
+
+        .highlight-card .hc-tag {
+            font-size: 0.66rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0.75;
+        }
+
+        .highlight-card .hc-cat {
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlight-card .hc-detail {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--ink-soft);
+            font-weight: 700;
+        }
+
+        /* ============ KATEGORİ İSTATİSTİĞİ ============ */
+        .cat-stats {
+            background: var(--paper);
+            border: 2px solid var(--line);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cat-stats h4 {
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--ink);
+            text-align: center;
+        }
+
+        .cat-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cat-stat-label {
+            width: 58px;
+            flex: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+        }
+
+        .cat-stat-bars {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cat-stat-bar-track {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 12px;
+        }
+
+        .cat-stat-bar-track .bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            min-width: 3px;
+            transition: width 0.4s ease;
+        }
+        .cat-stat-bar-track.p-bar .bar-fill { background: var(--win); }
+        .cat-stat-bar-track.b-bar .bar-fill { background: var(--danger); }
+
+        .cat-stat-bar-track .bar-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            min-width: 16px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .thinking-dots span, .chip-clock.low-time, .round-dots .dot.current, .flip-in { animation: none !important; }
+        }
+
+        @media (max-width: 420px) {
+            .wrapper { padding: 12px; gap: 10px; }
+            .players-row { gap: 6px; }
+            .player-chip { padding: 8px 9px; gap: 6px 8px; }
+            .chip-avatar { width: 34px; height: 34px; font-size: 1.1rem; }
+            .chip-info h3 { font-size: 0.76rem; }
+            .chip-info .chip-score { font-size: 0.65rem; }
+            .chip-clock { font-size: 0.95rem; width: 56px; flex: 0 0 56px; padding: 4px 6px; }
+            .answers-panels { gap: 6px; }
+            .answers-panel { padding: 8px; gap: 6px; }
+            .panel-title { font-size: 0.68rem; gap: 4px; }
+            .panel-row { padding: 6px 7px; }
+            .panel-row .cat-header { font-size: 0.58rem; }
+            .panel-row .cat-icon { width: 15px; height: 15px; font-size: 0.62rem; }
+            .val-input, .bot-val, .answer-row { font-size: 0.68rem; }
+        }
+
+        @media (max-width: 340px) {
+            .players-row { flex-direction: column; }
+            .chip-clock { width: auto; flex: 0 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <h1 id="main-title">İSİM-ŞEHİR</h1>
+
+    <!-- 1. Ekran: Kurulum -->
+    <div id="setup-screen" class="screen active">
+        <div class="setup-screen">
+            <div class="setup-intro">
+                Karşınıza oturan yapay zekayla hızlı turlar oynayın. Her turda yeni bir harf, altı kategori — hızlı düşünüp doğru yazan puanı kapar!
+            </div>
+            <div class="lifetime-stats" id="lifetime-stats">
+                <div class="ls-card"><span class="ls-val" id="ls-matches">0</span><span class="ls-label">Maç</span></div>
+                <div class="ls-card"><span class="ls-val" id="ls-wins">0</span><span class="ls-label">Galibiyet</span></div>
+                <div class="ls-card"><span class="ls-val" id="ls-streak">0</span><span class="ls-label">En İyi Seri</span></div>
+            </div>
+            <div class="form-group">
+                <label>Oyuncu Adı</label>
+                <input type="text" id="p-name" value="Oyuncu">
+            </div>
+            <div class="form-group">
+                <label>Yapay Zeka (Rakip)</label>
+                <select id="b-level">
+                    <option value="easy">Çaylak (Hızlı ama hata yapar)</option>
+                    <option value="medium" selected>Usta (Dengeli seviye)</option>
+                    <option value="hard">Kusursuz (Hiç hata yapmaz)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Soru Süresi</label>
+                <div class="setup-intro" style="padding:0; text-align:left; font-size:0.82rem;">Her kategori için 60 saniye süreniz var.</div>
+            </div>
+            <div class="form-group">
+                <label>Maç Formatı</label>
+                <div class="segmented" id="format-segmented">
+                    <button type="button" data-val="1">Tek Round</button>
+                    <button type="button" data-val="3" class="selected">3 Round Kazan</button>
+                    <button type="button" data-val="5">5 Round Kazan</button>
+                </div>
+            </div>
+            <button class="cta-btn" onclick="startMatch()">Oyuna Başla</button>
+            <a class="exit-btn" href="https://mugol-portal.github.io/mugol-.iq/">Çıkış</a>
+        </div>
+    </div>
+
+    <!-- 2. Ekran: Oyun Sahnesi -->
+    <div id="match-screen" class="screen">
+
+        <div class="top-bar">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" class="sound-toggle-btn" id="home-btn" onclick="goHome()" title="Ana sayfaya dön">🏠</button>
+                <div class="round-dots" id="round-dots"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="streak-chip" id="streak-chip">🔥 <span id="streak-count">0</span> Seri</div>
+                <button type="button" class="sound-toggle-btn" id="sound-toggle-btn" onclick="toggleSound()" title="Sesi aç/kapat">🔊</button>
+            </div>
+        </div>
+
+        <div class="players-row">
+            <div class="player-chip active-turn" id="card-player">
+                <div class="chip-main">
+                    <div class="chip-avatar">🙂</div>
+                    <div class="chip-info">
+                        <h3 id="player-title">Oyuncu</h3>
+                        <span class="chip-score">Skor: <span id="player-total-score">0</span></span>
+                    </div>
+                </div>
+                <div class="chip-clock" id="player-clock">01:00</div>
+            </div>
+
+            <div class="player-chip" id="card-bot">
+                <div class="chip-main">
+                    <div class="chip-avatar">🤖</div>
+                    <div class="chip-info">
+                        <h3 id="bot-title">Yapay Zeka</h3>
+                        <span class="chip-score">Skor: <span id="bot-total-score">0</span></span>
+                    </div>
+                </div>
+                <div class="chip-clock" id="bot-clock">01:00</div>
+                <div class="thinking-dots"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+
+        <div class="answers-panels">
+            <div class="answers-panel you-panel">
+                <div class="panel-title">🙂 Sizin Cevaplarınız</div>
+                <div class="panel-rows" id="you-panel-rows">
+                    <div class="panel-row" data-cat="isim" id="row-p-isim">
+                        <div class="cat-header"><span class="cat-icon">👤</span>İsim</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-isim" data-cat="isim" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('isim')">
+                            <span class="row-meta" id="m-p-meta-isim"></span>
+                        </div>
+                    </div>
+                    <div class="panel-row" data-cat="sehir" id="row-p-sehir">
+                        <div class="cat-header"><span class="cat-icon">🏙️</span>Şehir</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-sehir" data-cat="sehir" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('sehir')">
+                            <span class="row-meta" id="m-p-meta-sehir"></span>
+                        </div>
+                    </div>
+                    <div class="panel-row" data-cat="hayvan" id="row-p-hayvan">
+                        <div class="cat-header"><span class="cat-icon">🐾</span>Hayvan</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-hayvan" data-cat="hayvan" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('hayvan')">
+                            <span class="row-meta" id="m-p-meta-hayvan"></span>
+                        </div>
+                    </div>
+                    <div class="panel-row" data-cat="bitki" id="row-p-bitki">
+                        <div class="cat-header"><span class="cat-icon">🌿</span>Bitki</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-bitki" data-cat="bitki" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('bitki')">
+                            <span class="row-meta" id="m-p-meta-bitki"></span>
+                        </div>
+                    </div>
+                    <div class="panel-row" data-cat="esya" id="row-p-esya">
+                        <div class="cat-header"><span class="cat-icon">📦</span>Eşya</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-esya" data-cat="esya" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('esya')">
+                            <span class="row-meta" id="m-p-meta-esya"></span>
+                        </div>
+                    </div>
+                    <div class="panel-row" data-cat="ulke" id="row-p-ulke">
+                        <div class="cat-header"><span class="cat-icon">🌍</span>Ülke</div>
+                        <div class="panel-row-answer">
+                            <input class="val-input" id="m-p-ulke" data-cat="ulke" placeholder="—" autocomplete="off" disabled onkeydown="if(event.key === 'Enter') submitMove('ulke')">
+                            <span class="row-meta" id="m-p-meta-ulke"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="answers-panel bot-panel">
+                <div class="panel-title">🤖 Rakip Cevapları</div>
+                <div class="panel-rows" id="bot-panel-rows">
+                    <div class="panel-row" data-cat="isim" id="row-b-isim">
+                        <div class="cat-header"><span class="cat-icon">👤</span>İsim</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-isim">—</span></div>
+                    </div>
+                    <div class="panel-row" data-cat="sehir" id="row-b-sehir">
+                        <div class="cat-header"><span class="cat-icon">🏙️</span>Şehir</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-sehir">—</span></div>
+                    </div>
+                    <div class="panel-row" data-cat="hayvan" id="row-b-hayvan">
+                        <div class="cat-header"><span class="cat-icon">🐾</span>Hayvan</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-hayvan">—</span></div>
+                    </div>
+                    <div class="panel-row" data-cat="bitki" id="row-b-bitki">
+                        <div class="cat-header"><span class="cat-icon">🌿</span>Bitki</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-bitki">—</span></div>
+                    </div>
+                    <div class="panel-row" data-cat="esya" id="row-b-esya">
+                        <div class="cat-header"><span class="cat-icon">📦</span>Eşya</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-esya">—</span></div>
+                    </div>
+                    <div class="panel-row" data-cat="ulke" id="row-b-ulke">
+                        <div class="cat-header"><span class="cat-icon">🌍</span>Ülke</div>
+                        <div class="panel-row-answer"><span class="bot-val empty" id="m-b-ulke">—</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hint-row">
+            <button class="hint-btn" id="hint-btn" onclick="useHint()">💡 İpucu (<span id="hint-count">1</span>)</button>
+        </div>
+
+        <div class="turn-hint" id="turn-hint">Sıra sizde — bir kategoriye tıklayıp yazın, Enter'a basın</div>
+
+        <div class="history-strip" id="history-strip"></div>
+    </div>
+
+    <!-- 3. Ekran: Maç Sonucu / Analiz -->
+    <div id="game-over-screen" class="screen">
+        <div class="result-screen-inner">
+            <div class="game-over-banner" id="game-over-banner">SONUÇ</div>
+
+            <div class="badges-earned" id="badges-earned"></div>
+
+            <div>
+                <div class="analysis-section-title" style="margin-bottom: 8px;">Maç Özeti</div>
+                <div class="stat-cards-grid" id="stat-cards-grid"></div>
+            </div>
+
+            <div class="breakdown-card">
+                <div class="breakdown-title">Cevap Dağılımınız</div>
+                <div class="breakdown-track" id="breakdown-track"></div>
+                <div class="breakdown-legend">
+                    <span><span class="dot-legend correct"></span>Doğru <span id="bd-correct">0</span></span>
+                    <span><span class="dot-legend wrong"></span>Yanlış <span id="bd-wrong">0</span></span>
+                    <span><span class="dot-legend pass"></span>Pas <span id="bd-pass">0</span></span>
+                </div>
+            </div>
+
+            <div class="highlight-cards" id="highlight-cards"></div>
+
+            <div class="cat-stats" id="cat-stats">
+                <h4>Kategori Bazında Puanlar</h4>
+                <div id="cat-stats-rows"></div>
+            </div>
+
+            <div>
+                <div class="analysis-section-title" style="margin-bottom: 8px;">Round Geçmişi</div>
+                <div class="history-strip" id="final-history-strip"></div>
+            </div>
+
+            <button class="cta-btn" onclick="rematchSameSettings()">Aynı Ayarlarla Tekrar Oyna</button>
+            <button class="exit-btn" style="cursor:pointer;" onclick="resetMatch()">Yeni Maç Ayarla</button>
+        </div>
+    </div>
+</div>
+
+<script src="veriler.js"></script>
+<script>
+    const alphabet = Object.keys(database);
+    const categories = ["isim", "sehir", "hayvan", "bitki", "esya", "ulke"];
+    const catLabels = { isim: "İsim", sehir: "Şehir", hayvan: "Hayvan", bitki: "Bitki", esya: "Eşya", ulke: "Ülke" };
+
+    // Ses efektleri (WebAudio - dosya gerektirmez)
+    let audioCtx = null;
+    let soundEnabled = (localStorage.getItem('isimSehirSoundEnabled') !== 'false');
+    function playTone(freq, duration, type = 'sine', vol = 0.12) {
+        if (!soundEnabled) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.value = vol;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + duration);
+        } catch (e) { /* ses desteklenmiyorsa sessizce geç */ }
+    }
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('isimSehirSoundEnabled', soundEnabled ? 'true' : 'false');
+        updateSoundButton();
+        if (soundEnabled) playTone(660, 0.1, 'sine', 0.1);
+    }
+    function updateSoundButton() {
+        const btn = document.getElementById('sound-toggle-btn');
+        if (!btn) return;
+        btn.textContent = soundEnabled ? '🔊' : '🔇';
+        btn.classList.toggle('muted', !soundEnabled);
+    }
+    const sfx = {
+        submit: () => playTone(520, 0.1, 'triangle', 0.1),
+        botMove: () => playTone(340, 0.12, 'sine', 0.08),
+        correct: () => { playTone(660, 0.1, 'sine', 0.1); setTimeout(() => playTone(880, 0.15, 'sine', 0.1), 90); },
+        wrong: () => playTone(160, 0.2, 'sawtooth', 0.08),
+        roundWin: () => { playTone(523, 0.12); setTimeout(() => playTone(659, 0.12), 100); setTimeout(() => playTone(784, 0.2), 200); },
+        roundLose: () => { playTone(300, 0.15, 'sawtooth', 0.09); setTimeout(() => playTone(220, 0.25, 'sawtooth', 0.09), 120); },
+        matchEnd: () => { playTone(523, 0.15); setTimeout(() => playTone(659, 0.15), 130); setTimeout(() => playTone(784, 0.15), 260); setTimeout(() => playTone(1046, 0.3), 390); },
+        tick: () => playTone(880, 0.05, 'square', 0.04),
+    };
+
+    let pName = "Oyuncu";
+    let bLevel = "medium";
+    let roundDuration = 60000;
+    let matchFormat = 3; // kaç round kazanılınca maç biter
+    let currentLetter = "A";
+
+    let activeCategoryIndex = 0;
+    let turn = "player";
+
+    let pTime = 60000;
+    let bTime = 60000;
+    let clockInterval;
+
+    let pAnswers = {};
+    let bAnswers = {};
+    let pAnswerTimes = {};
+    let pScoreSum = 0;
+    let bScoreSum = 0;
+
+    let hintUsed = false;
+    let turnStartTime = 0;
+
+    // Kategori bazlı toplam puan istatistiği (maç boyunca birikir)
+    let catStats = {};
+    categories.forEach(c => catStats[c] = { p: 0, b: 0 });
+
+    // Maç geneli analiz verileri
+    let matchAnalysis = {
+        pCorrect: 0, pWrong: 0, pPass: 0,
+        bCorrect: 0, bWrong: 0, bPass: 0,
+        speedBonusCount: 0,
+        hintUsedCount: 0,
+        totalAnswerTime: 0,
+        answerTimeCount: 0,
+        matchTotalP: 0,
+        matchTotalB: 0
+    };
+
+    let pRoundsWon = 0;
+    let bRoundsWon = 0;
+    let roundHistory = []; // {letter, winner: 'p'|'b'|'draw'}
+    let currentStreak = 0; // oyuncunun art arda round kazanma serisi
+    let bestStreak = 0;
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function formatTime(ms) {
+        let totalSec = Math.ceil(ms / 1000);
+        let min = Math.floor(totalSec / 60);
+        let sec = totalSec % 60;
+        return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    // Kurulum ekranı segmented control davranışı (soru süresi artık sabit 60sn)
+
+    document.getElementById('format-segmented').addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') return;
+        document.querySelectorAll('#format-segmented button').forEach(b => b.classList.remove('selected'));
+        e.target.classList.add('selected');
+        matchFormat = parseInt(e.target.dataset.val, 10);
+    });
+
+    function startMatch() {
+        pName = document.getElementById('p-name').value.trim() || "Oyuncu";
+        bLevel = document.getElementById('b-level').value;
+
+        document.getElementById('player-title').textContent = pName;
+
+        let botLabel = "Usta";
+        if (bLevel === "easy") botLabel = "Çaylak";
+        if (bLevel === "hard") botLabel = "Kusursuz";
+        document.getElementById('bot-title').textContent = botLabel;
+
+        pRoundsWon = 0;
+        bRoundsWon = 0;
+        roundHistory = [];
+        currentStreak = 0;
+        bestStreak = 0;
+        categories.forEach(c => catStats[c] = { p: 0, b: 0 });
+        matchAnalysis = {
+            pCorrect: 0, pWrong: 0, pPass: 0,
+            bCorrect: 0, bWrong: 0, bPass: 0,
+            speedBonusCount: 0,
+            hintUsedCount: 0,
+            totalAnswerTime: 0,
+            answerTimeCount: 0,
+            matchTotalP: 0,
+            matchTotalB: 0
+        };
+        updateRoundDots();
+        updateStreakChip();
+        renderHistory('history-strip');
+
+        showScreen('match-screen');
+        startRound();
+    }
+
+    function startRound() {
+        currentLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+        const h1Text = document.getElementById('main-title');
+        h1Text.innerHTML = `İSİM-ŞEHİR <span class="letter-badge">${currentLetter}</span>`;
+
+        activeCategoryIndex = 0;
+        pTime = roundDuration;
+        bTime = roundDuration;
+        pScoreSum = 0;
+        bScoreSum = 0;
+        pAnswers = {};
+        bAnswers = {};
+        pAnswerTimes = {};
+
+        hintUsed = false;
+        document.getElementById('hint-btn').disabled = false;
+        document.getElementById('hint-count').textContent = "1";
+
+        document.getElementById('player-total-score').textContent = "0";
+        document.getElementById('bot-total-score').textContent = "0";
+        document.getElementById('player-clock').textContent = formatTime(pTime);
+        document.getElementById('bot-clock').textContent = formatTime(bTime);
+        document.getElementById('player-clock').classList.remove('low-time');
+        document.getElementById('bot-clock').classList.remove('low-time');
+
+        categories.forEach(cat => {
+            const rowP = document.getElementById(`row-p-${cat}`);
+            const rowB = document.getElementById(`row-b-${cat}`);
+            rowP.className = "panel-row";
+            rowB.className = "panel-row";
+            const pCell = document.getElementById(`m-p-${cat}`);
+            const bCell = document.getElementById(`m-b-${cat}`);
+            const pMeta = document.getElementById(`m-p-meta-${cat}`);
+            pCell.value = "";
+            pCell.disabled = true;
+            pCell.placeholder = "—";
+            pCell.classList.remove('flip-in');
+            pMeta.innerHTML = "";
+            bCell.textContent = "—";
+            bCell.className = "bot-val empty";
+        });
+
+        startTurn('player');
+    }
+
+    function startTurn(activeUser) {
+        turn = activeUser;
+        clearInterval(clockInterval);
+
+        document.getElementById('card-player').classList.remove('active-turn');
+        document.getElementById('card-bot').classList.remove('active-turn', 'bot-active', 'is-thinking');
+
+        if (turn === "player") {
+            document.getElementById('card-player').classList.add('active-turn');
+            document.getElementById('turn-hint').textContent = "Sıra sizde — kategoriye yazıp Enter'a basın";
+            document.getElementById('turn-hint').classList.remove('bot-turn');
+            document.getElementById('hint-btn').disabled = hintUsed;
+
+            const activeCat = categories[activeCategoryIndex];
+            document.getElementById(`row-p-${activeCat}`).classList.add('current-move');
+            document.getElementById(`row-b-${activeCat}`).classList.add('current-move');
+
+            const activeInput = document.getElementById(`m-p-${activeCat}`);
+            activeInput.disabled = false;
+            activeInput.focus();
+
+            pTime = roundDuration;
+            document.getElementById('player-clock').classList.remove('low-time');
+            turnStartTime = Date.now();
+
+            clockInterval = setInterval(() => {
+                pTime -= 100;
+                document.getElementById('player-clock').textContent = formatTime(pTime);
+                if (pTime <= 15000) {
+                    document.getElementById('player-clock').classList.add('low-time');
+                    if (Math.round(pTime / 100) % 10 === 0) sfx.tick();
+                }
+                if (pTime <= 0) {
+                    clearInterval(clockInterval);
+                    timeoutLose('player');
+                }
+            }, 100);
+        } else {
+            document.getElementById('card-bot').classList.add('active-turn', 'bot-active', 'is-thinking');
+            document.getElementById('turn-hint').textContent = "Rakip düşünüyor...";
+            document.getElementById('turn-hint').classList.add('bot-turn');
+            document.getElementById('hint-btn').disabled = true;
+
+            categories.forEach(cat => {
+                document.getElementById(`m-p-${cat}`).disabled = true;
+            });
+
+            bTime = roundDuration;
+            document.getElementById('bot-clock').classList.remove('low-time');
+
+            clockInterval = setInterval(() => {
+                bTime -= 100;
+                document.getElementById('bot-clock').textContent = formatTime(bTime);
+                if (bTime <= 15000) {
+                    document.getElementById('bot-clock').classList.add('low-time');
+                }
+                if (bTime <= 0) {
+                    clearInterval(clockInterval);
+                    timeoutLose('bot');
+                }
+            }, 100);
+
+            simulateBotMove();
+        }
+    }
+
+    function useHint() {
+        if (hintUsed || turn !== "player") return;
+        const activeCat = categories[activeCategoryIndex];
+        const answer = pickAnswer(currentLetter, activeCat);
+        if (!answer) return;
+
+        hintUsed = true;
+        matchAnalysis.hintUsedCount++;
+        document.getElementById('hint-btn').disabled = true;
+        document.getElementById('hint-count').textContent = "0";
+
+        const input = document.getElementById(`m-p-${activeCat}`);
+        const prefix = answer.slice(0, 2);
+        input.value = prefix;
+        input.focus();
+        input.setSelectionRange(prefix.length, prefix.length);
+        sfx.tick();
+    }
+
+    function submitMove(fromCat) {
+        if (turn !== "player") return;
+
+        const activeCat = categories[activeCategoryIndex];
+        if (fromCat && fromCat !== activeCat) return;
+
+        const pMoveCell = document.getElementById(`m-p-${activeCat}`);
+        const val = pMoveCell.value.trim();
+        const elapsed = Date.now() - turnStartTime;
+
+        pAnswers[activeCat] = val;
+        pAnswerTimes[activeCat] = elapsed;
+        sfx.submit();
+
+        pMoveCell.value = val;
+        pMoveCell.disabled = true;
+        pMoveCell.placeholder = "Pas";
+        pMoveCell.classList.add('flip-in');
+
+        startTurn('bot');
+    }
+
+    function simulateBotMove() {
+        const activeCat = categories[activeCategoryIndex];
+
+        let delay = 1500 + Math.random() * 2000;
+        if (bLevel === "easy") delay = 2000 + Math.random() * 3000;
+
+        let skipChance = 0.15;
+        if (bLevel === "easy") skipChance = 0.40;
+        if (bLevel === "hard") skipChance = 0;
+
+        const bWrites = Math.random() >= skipChance;
+
+        setTimeout(() => {
+            if (pTime <= 0 || bTime <= 0) return;
+
+            const answer = bWrites ? pickAnswer(currentLetter, activeCat) : "";
+            bAnswers[activeCat] = answer;
+            sfx.botMove();
+
+            const bMoveCell = document.getElementById(`m-b-${activeCat}`);
+            bMoveCell.textContent = answer !== "" ? answer : "Pas";
+            bMoveCell.classList.remove('empty');
+            bMoveCell.classList.add('flip-in');
+
+            evaluateCategory(activeCat);
+
+            document.getElementById(`row-p-${activeCat}`).classList.remove('current-move');
+            document.getElementById(`row-b-${activeCat}`).classList.remove('current-move');
+            document.getElementById('card-bot').classList.remove('is-thinking');
+
+            activeCategoryIndex++;
+
+            if (activeCategoryIndex < categories.length) {
+                startTurn('player');
+            } else {
+                endRound();
+            }
+        }, delay);
+    }
+
+    function checkValid(word, letter) {
+        if (!word || word.trim() === "") return false;
+        return word.trim().toLocaleLowerCase('tr-TR').startsWith(letter.toLocaleLowerCase('tr-TR'));
+    }
+
+    function evaluateCategory(cat) {
+        const pVal = pAnswers[cat];
+        const bVal = bAnswers[cat];
+
+        const pOk = checkValid(pVal, currentLetter);
+        const bOk = checkValid(bVal, currentLetter);
+
+        let pPoints = 0;
+        let bPoints = 0;
+
+        if (pOk && bOk) {
+            if (pVal.trim().toLocaleLowerCase('tr-TR') === bVal.trim().toLocaleLowerCase('tr-TR')) {
+                pPoints = 5;
+                bPoints = 5;
+            } else {
+                pPoints = 10;
+                bPoints = 10;
+            }
+        } else if (pOk && !bOk) {
+            pPoints = 10;
+            bPoints = 0;
+        } else if (!pOk && bOk) {
+            pPoints = 0;
+            bPoints = 10;
+        }
+
+        // Hız bonusu: 5 saniyeden hızlı doğru cevaba +3 bonus puan
+        let pSpeedBonus = false;
+        const elapsed = pAnswerTimes[cat];
+        if (pOk && pPoints > 0 && typeof elapsed === "number" && elapsed < 5000) {
+            pPoints += 3;
+            pSpeedBonus = true;
+            matchAnalysis.speedBonusCount++;
+        }
+
+        if (pPoints > bPoints) sfx.correct();
+        else if (bPoints > pPoints) sfx.wrong();
+
+        pScoreSum += pPoints;
+        bScoreSum += bPoints;
+
+        catStats[cat].p += pPoints;
+        catStats[cat].b += bPoints;
+
+        matchAnalysis.matchTotalP += pPoints;
+        matchAnalysis.matchTotalB += bPoints;
+
+        // Oyuncu doğru/yanlış/pas sayımı
+        if (!pVal || pVal.trim() === "") matchAnalysis.pPass++;
+        else if (pOk) matchAnalysis.pCorrect++;
+        else matchAnalysis.pWrong++;
+
+        // Rakip doğru/yanlış/pas sayımı
+        if (!bVal || bVal.trim() === "") matchAnalysis.bPass++;
+        else if (bOk) matchAnalysis.bCorrect++;
+        else matchAnalysis.bWrong++;
+
+        if (typeof elapsed === "number") {
+            matchAnalysis.totalAnswerTime += elapsed;
+            matchAnalysis.answerTimeCount++;
+        }
+
+        document.getElementById('player-total-score').textContent = pScoreSum;
+        document.getElementById('bot-total-score').textContent = bScoreSum;
+
+        const pCell = document.getElementById(`m-p-${cat}`);
+        const bCell = document.getElementById(`m-b-${cat}`);
+        const pMeta = document.getElementById(`m-p-meta-${cat}`);
+
+        if (pOk) {
+            pMeta.innerHTML = `<span class="move-pts">${pPoints}</span>`;
+            if (pSpeedBonus) pMeta.innerHTML += ` <span class="speed-badge">⚡</span>`;
+        }
+        if (bOk) bCell.innerHTML += ` <span class="move-pts">${bPoints}</span>`;
+    }
+
+    function updateRoundDots() {
+        const container = document.getElementById('round-dots');
+        container.innerHTML = "";
+        const totalDots = matchFormat === 1 ? 1 : (matchFormat * 2 - 1);
+        for (let i = 0; i < totalDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (roundHistory[i]) {
+                if (roundHistory[i].winner === 'p') dot.classList.add('won-player');
+                else if (roundHistory[i].winner === 'b') dot.classList.add('won-bot');
+            } else if (i === roundHistory.length) {
+                dot.classList.add('current');
+            }
+            container.appendChild(dot);
+        }
+        const label = document.createElement('span');
+        label.className = 'round-label';
+        label.textContent = matchFormat === 1 ? 'Tek Round' : `${pRoundsWon} - ${bRoundsWon}`;
+        container.appendChild(label);
+    }
+
+    function updateStreakChip() {
+        const chip = document.getElementById('streak-chip');
+        const countEl = document.getElementById('streak-count');
+        if (currentStreak >= 2) {
+            countEl.textContent = currentStreak;
+            chip.classList.add('show');
+        } else {
+            chip.classList.remove('show');
+        }
+    }
+
+    function renderHistory(targetId) {
+        const container = document.getElementById(targetId);
+        if (!container) return;
+        container.innerHTML = "";
+        roundHistory.forEach(r => {
+            const chip = document.createElement('div');
+            chip.className = 'history-chip ' + (r.winner === 'p' ? 'win-p' : r.winner === 'b' ? 'win-b' : 'draw-h');
+            const letterEl = document.createElement('div');
+            letterEl.className = 'h-letter';
+            letterEl.textContent = r.letter;
+            const resultEl = document.createElement('div');
+            resultEl.className = 'h-result';
+            resultEl.textContent = r.winner === 'p' ? 'Siz' : r.winner === 'b' ? 'Rakip' : 'Berabere';
+            chip.appendChild(letterEl);
+            chip.appendChild(resultEl);
+            container.appendChild(chip);
+        });
+    }
+
+    function timeoutLose(loser) {
+        clearInterval(clockInterval);
+        if (loser === 'player') {
+            finishRound('b', "ZAMAN AŞIMI! Bu round rakibin oldu.");
+        } else {
+            finishRound('p', "RAKİBİN ZAMANI BİTTİ! Bu round sizin oldu.");
+        }
+    }
+
+    function endRound() {
+        clearInterval(clockInterval);
+        let winner = 'draw';
+        if (pScoreSum > bScoreSum) winner = 'p';
+        else if (bScoreSum > pScoreSum) winner = 'b';
+        finishRound(winner, null);
+    }
+
+    function finishRound(winner, forcedMessage) {
+        roundHistory.push({ letter: currentLetter, winner });
+
+        if (winner === 'p') {
+            pRoundsWon++;
+            currentStreak++;
+            bestStreak = Math.max(bestStreak, currentStreak);
+            sfx.roundWin();
+        } else if (winner === 'b') {
+            bRoundsWon++;
+            currentStreak = 0;
+            sfx.roundLose();
+        } else {
+            currentStreak = 0;
+        }
+
+        updateRoundDots();
+        updateStreakChip();
+        renderHistory('history-strip');
+
+        const matchOver = (matchFormat === 1) || pRoundsWon >= matchFormat || bRoundsWon >= matchFormat;
+
+        if (matchOver) {
+            endMatch();
+        } else {
+            // Kısa bir bekleme ile sonraki round'a geç (kullanıcı skoru görsün)
+            setTimeout(() => startRound(), 1400);
+        }
+    }
+
+    function endMatch() {
+        sfx.matchEnd();
+        const banner = document.getElementById('game-over-banner');
+        const scoreDetail = `<span class="go-score">Toplam Puan: ${matchAnalysis.matchTotalP} - ${matchAnalysis.matchTotalB}</span>`;
+
+        if (pRoundsWon > bRoundsWon) {
+            banner.innerHTML = `🏆 MAÇI KAZANDINIZ! (${pRoundsWon} - ${bRoundsWon})${scoreDetail}`;
+            banner.className = "game-over-banner win";
+        } else if (bRoundsWon > pRoundsWon) {
+            banner.innerHTML = `😔 MAÇI RAKİP KAZANDI (${pRoundsWon} - ${bRoundsWon})${scoreDetail}`;
+            banner.className = "game-over-banner lose";
+        } else {
+            banner.innerHTML = `🤝 BERABERLİK (${pRoundsWon} - ${bRoundsWon})${scoreDetail}`;
+            banner.className = "game-over-banner draw";
+        }
+
+        renderBadges();
+        renderStatCards();
+        renderBreakdown();
+        renderHighlightCards();
+        renderCatStats();
+        renderHistory('final-history-strip');
+        saveLifetimeStats(pRoundsWon > bRoundsWon);
+        showScreen('game-over-screen');
+    }
+
+    function renderStatCards() {
+        const container = document.getElementById('stat-cards-grid');
+        container.innerHTML = "";
+
+        const totalRounds = roundHistory.length;
+        const avgTime = matchAnalysis.answerTimeCount > 0
+            ? (matchAnalysis.totalAnswerTime / matchAnalysis.answerTimeCount / 1000)
+            : 0;
+
+        const cards = [
+            { icon: '🎯', value: totalRounds, label: 'Oynanan Round' },
+            { icon: '🔥', value: bestStreak, label: 'En Uzun Seri' },
+            { icon: '⚡', value: matchAnalysis.speedBonusCount, label: 'Hız Bonusu' },
+            { icon: '⏱️', value: avgTime > 0 ? `${avgTime.toFixed(1)} sn` : '—', label: 'Ort. Cevap Süresi' },
+            { icon: '💡', value: matchAnalysis.hintUsedCount, label: 'Kullanılan İpucu' },
+            { icon: '📈', value: `${matchAnalysis.matchTotalP} puan`, label: 'Toplam Skorunuz' },
+        ];
+
+        cards.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'stat-card';
+            card.innerHTML = `<span class="stat-icon">${c.icon}</span><span class="stat-value">${c.value}</span><span class="stat-label">${c.label}</span>`;
+            container.appendChild(card);
+        });
+    }
+
+    function renderBreakdown() {
+        const { pCorrect, pWrong, pPass } = matchAnalysis;
+        const total = Math.max(1, pCorrect + pWrong + pPass);
+
+        const track = document.getElementById('breakdown-track');
+        track.innerHTML = "";
+
+        const segCorrect = document.createElement('div');
+        segCorrect.className = 'seg-correct';
+        segCorrect.style.width = `${(pCorrect / total) * 100}%`;
+
+        const segWrong = document.createElement('div');
+        segWrong.className = 'seg-wrong';
+        segWrong.style.width = `${(pWrong / total) * 100}%`;
+
+        const segPass = document.createElement('div');
+        segPass.className = 'seg-pass';
+        segPass.style.width = `${(pPass / total) * 100}%`;
+
+        track.appendChild(segCorrect);
+        track.appendChild(segWrong);
+        track.appendChild(segPass);
+
+        document.getElementById('bd-correct').textContent = pCorrect;
+        document.getElementById('bd-wrong').textContent = pWrong;
+        document.getElementById('bd-pass').textContent = pPass;
+    }
+
+    function renderHighlightCards() {
+        const container = document.getElementById('highlight-cards');
+        container.innerHTML = "";
+
+        let bestCat = null, worstCat = null;
+        categories.forEach(cat => {
+            const p = catStats[cat].p;
+            if (bestCat === null || p > catStats[bestCat].p) bestCat = cat;
+            if (worstCat === null || p < catStats[worstCat].p) worstCat = cat;
+        });
+
+        if (!bestCat) return;
+
+        const bestCard = document.createElement('div');
+        bestCard.className = 'highlight-card best';
+        bestCard.innerHTML = `
+            <span class="hc-tag">💪 En Güçlü Kategoriniz</span>
+            <span class="hc-cat">${catLabels[bestCat]}</span>
+            <span class="hc-detail">${catStats[bestCat].p} puan</span>
+        `;
+
+        const worstCard = document.createElement('div');
+        worstCard.className = 'highlight-card worst';
+        worstCard.innerHTML = `
+            <span class="hc-tag">🎯 Gelişim Alanınız</span>
+            <span class="hc-cat">${catLabels[worstCat]}</span>
+            <span class="hc-detail">${catStats[worstCat].p} puan</span>
+        `;
+
+        container.appendChild(bestCard);
+        container.appendChild(worstCard);
+    }
+
+    function renderCatStats() {
+        const container = document.getElementById('cat-stats-rows');
+        container.innerHTML = "";
+        const maxVal = Math.max(1, ...categories.map(c => Math.max(catStats[c].p, catStats[c].b)));
+
+        categories.forEach(cat => {
+            const { p, b } = catStats[cat];
+            const row = document.createElement('div');
+            row.className = 'cat-stat-row';
+
+            const label = document.createElement('div');
+            label.className = 'cat-stat-label';
+            label.textContent = catLabels[cat];
+
+            const bars = document.createElement('div');
+            bars.className = 'cat-stat-bars';
+
+            const pTrack = document.createElement('div');
+            pTrack.className = 'cat-stat-bar-track p-bar';
+            const pFill = document.createElement('div');
+            pFill.className = 'bar-fill';
+            pFill.style.width = `${(p / maxVal) * 100}%`;
+            const pValSpan = document.createElement('span');
+            pValSpan.className = 'bar-val';
+            pValSpan.textContent = p;
+            pTrack.appendChild(pFill);
+            pTrack.appendChild(pValSpan);
+
+            const bTrack = document.createElement('div');
+            bTrack.className = 'cat-stat-bar-track b-bar';
+            const bFill = document.createElement('div');
+            bFill.className = 'bar-fill';
+            bFill.style.width = `${(b / maxVal) * 100}%`;
+            const bValSpan = document.createElement('span');
+            bValSpan.className = 'bar-val';
+            bValSpan.textContent = b;
+            bTrack.appendChild(bFill);
+            bTrack.appendChild(bValSpan);
+
+            bars.appendChild(pTrack);
+            bars.appendChild(bTrack);
+
+            row.appendChild(label);
+            row.appendChild(bars);
+            container.appendChild(row);
+        });
+    }
+
+    function renderBadges() {
+        const container = document.getElementById('badges-earned');
+        container.innerHTML = "";
+        const badges = [];
+
+        if (pRoundsWon > bRoundsWon) badges.push({ icon: '🏆', label: 'Maç Galibi' });
+        if (bestStreak >= 2) badges.push({ icon: '🔥', label: `${bestStreak} Round Serisi` });
+        if (bRoundsWon === 0 && roundHistory.length > 0) badges.push({ icon: '🛡️', label: 'Yenilgisiz' });
+        const allCorrectRound = pScoreSum >= 50;
+        if (allCorrectRound) badges.push({ icon: '⭐', label: 'Tam Puan Round' });
+        if (bLevel === 'hard' && pRoundsWon > bRoundsWon) badges.push({ icon: '💎', label: 'Kusursuzu Yendin' });
+
+        if (badges.length === 0) {
+            badges.push({ icon: '🎯', label: 'Katılım' });
+        }
+
+        badges.forEach(b => {
+            const pill = document.createElement('div');
+            pill.className = 'badge-pill';
+            pill.innerHTML = `<span>${b.icon}</span><span>${b.label}</span>`;
+            container.appendChild(pill);
+        });
+    }
+
+    function resetMatch() {
+        showScreen('setup-screen');
+        renderLifetimeStats();
+    }
+
+    function rematchSameSettings() {
+        showScreen('match-screen');
+        startRound();
+    }
+
+    function goHome() {
+        const confirmLeave = confirm("Ana sayfaya dönmek istediğinize emin misiniz? Devam eden maç kaybolacak.");
+        if (!confirmLeave) return;
+        clearInterval(clockInterval);
+        showScreen('setup-screen');
+        renderLifetimeStats();
+    }
+
+    // ============ ÖMÜR BOYU İSTATİSTİKLER (tarayıcıda saklanır) ============
+    function loadLifetimeStats() {
+        try {
+            const raw = localStorage.getItem('isimSehirLifetimeStats');
+            if (!raw) return { matches: 0, wins: 0, bestStreak: 0 };
+            const parsed = JSON.parse(raw);
+            return {
+                matches: parsed.matches || 0,
+                wins: parsed.wins || 0,
+                bestStreak: parsed.bestStreak || 0
+            };
+        } catch (e) {
+            return { matches: 0, wins: 0, bestStreak: 0 };
+        }
+    }
+
+    function saveLifetimeStats(playerWonMatch) {
+        try {
+            const stats = loadLifetimeStats();
+            stats.matches += 1;
+            if (playerWonMatch) stats.wins += 1;
+            stats.bestStreak = Math.max(stats.bestStreak, bestStreak);
+            localStorage.setItem('isimSehirLifetimeStats', JSON.stringify(stats));
+        } catch (e) { /* localStorage yoksa sessizce geç */ }
+        renderLifetimeStats();
+    }
+
+    function renderLifetimeStats() {
+        const stats = loadLifetimeStats();
+        const mEl = document.getElementById('ls-matches');
+        const wEl = document.getElementById('ls-wins');
+        const sEl = document.getElementById('ls-streak');
+        if (mEl) mEl.textContent = stats.matches;
+        if (wEl) wEl.textContent = stats.wins;
+        if (sEl) sEl.textContent = stats.bestStreak;
+    }
+
+    // İlk yükleme: ses butonu ve ömür boyu istatistikleri hazırla
+    updateSoundButton();
+    renderLifetimeStats();
+</script>
+
+</body>
+</html>
